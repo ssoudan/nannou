@@ -30,7 +30,7 @@ use winit;
 use winit::event_loop::ControlFlow;
 
 /// The user function type for initialising their model.
-pub type ModelFn<Model> = fn(&App) -> Model;
+pub type ModelFn<Model> = dyn Fn(&App) -> Model;
 
 /// The user function type for updating their model in accordance with some event.
 pub type EventFn<Model, Event> = fn(&App, &mut Model, Event);
@@ -57,7 +57,7 @@ enum View<Model = ()> {
 
 /// A nannou `App` builder.
 pub struct Builder<M = (), E = Event> {
-    model: ModelFn<M>,
+    model: Box<ModelFn<M>>,
     event: Option<EventFn<M, E>>,
     update: Option<UpdateFn<M>>,
     default_view: Option<View<M>>,
@@ -250,9 +250,9 @@ where
     ///
     /// The Model that is returned by the function is the same model that will be passed to the
     /// given event and view functions.
-    pub fn new(model: ModelFn<M>) -> Self {
+    pub fn new(model: impl Fn(&App) -> M + 'static) -> Self {
         Builder {
-            model,
+            model: Box::new(model),
             event: None,
             update: None,
             default_view: None,
