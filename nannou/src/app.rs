@@ -57,6 +57,7 @@ enum View<Model = ()> {
 /// A nannou `App` builder.
 pub struct Builder<M = (), E = Event> {
     model: Box<ModelFn<M>>,
+    config: Config,
     event: Option<EventFn<M, E>>,
     update: Option<UpdateFn<M>>,
     default_view: Option<View<M>>,
